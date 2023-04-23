@@ -10,6 +10,8 @@
 #include "buffer.h"
 #include <unistd.h>
 #include <pthread.h>
+#include <semaphore.h>
+
 using namespace std;
 
 // global buffer object

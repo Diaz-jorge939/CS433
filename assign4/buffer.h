@@ -19,6 +19,7 @@ typedef int buffer_item;
 class Buffer {
 private: 
     buffer_item* arr_buffer;
+    int buffer_size;
     int in = 0;
     int out = 0;
     int count = 0;
