@@ -13,29 +13,22 @@
 
 Buffer::Buffer(int size){
     /* the buffer */
-    arr_buffer = new int[size];
+    arr_buffer = new buffer_item[size];
 
 }
 Buffer::~Buffer(){
-    del arr_buffer[];
+    delete arr_buffer[];
 }
 
 bool Buffer::insert_item(buffer_item item){
     /* insert item into buffer
    return 0 if successful, otherwise
    return -1 indicating an error condition */
-   while (true) {
-        . . .
-    /* produce an item in next_produced */
-        . . .
-    wait(empty);
-    wait(mutex);
-        . . .
-    /* add next_produced to the buffer */
-        . . .
-    signal(mutex);
-    signal(full);
-    }
+   // Insert the item into the buffer
+    int insert_index = (in + 1) % BUFFER_SIZE;
+    buffer[insert_index] = item;
+    in = insert_index;
+    count++;
     
 }
 bool Buffer::remove_item(buffer_item *item){
@@ -43,18 +36,6 @@ bool Buffer::remove_item(buffer_item *item){
    placing it in item
    return 0 if successful, otherwise
    return -1 indicating an error condition */
-   while (true) {
-        wait(full);
-        wait(mutex);
-            . . .
-        /* remove an item from buffer to next_consumed */
-            . . .
-        signal(mutex);
-        signal(empty);
-            . . .
-        /* consume the item in next_consumed */
-            . . .
-    }
 
 }
 int Buffer::get_size(){

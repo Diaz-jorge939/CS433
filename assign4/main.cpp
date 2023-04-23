@@ -17,35 +17,8 @@ Buffer buffer;
 
 // Declare a semaphore and a mutex
 pthread_mutex_t mutex;
-int empty = 10;
-int full = 0;
-
-// Function that waits for the semaphore to become available
-void wait_for_semaphore() {
-    // Acquire the mutex
-    pthread_mutex_lock(&mutex);
-    while (semaphore == 0) {
-        // Wait for the condition variable to be signaled
-        pthread_cond_wait(&cond, &mutex);
-    }
-    // Decrement the semaphore
-    semaphore--;
-    // Release the mutex
-    pthread_mutex_unlock(&mutex);
-}
-
-// Function that signals that the semaphore is now available
-void signal_semaphore() {
-    // Acquire the mutex
-    pthread_mutex_lock(&mutex);
-    // Increment the semaphore
-    semaphore++;
-    // Signal the condition variable
-    pthread_cond_signal(&cond);
-    // Release the mutex
-    pthread_mutex_unlock(&mutex);
-}
-
+sem_t empty;
+sem_t full;
 
 // Producer thread function
 // TODO: Add your implementation of the producer thread here
@@ -59,7 +32,8 @@ void *producer(void *param) {
         usleep(rand()%1000000);
 
         // TODO: Add synchronization code here
-        while (count == BUFFER_SIZE) {}     // busy waiting, do nothing
+        sem_wait(&empty);
+        pthread_mutex_lock(&mutex);
 
         if (buffer.insert_item(item)) {
             cout << "Producer " << item << ": Inserted item " << item << endl;
@@ -67,6 +41,9 @@ void *producer(void *param) {
         } else {
             cout << "Producer error condition"  << endl;    // shouldn't come here
         }
+
+        pthread_mutex_unlock(&mutex);
+        sem_post(&full);
     }
 }
 
@@ -79,12 +56,19 @@ void *consumer(void *param) {
         /* sleep for a random period of time */
         usleep(rand() % 1000000);
         // TODO: Add synchronization code here
+
+        sem_wait(&full);
+        pthread_mutex_lock(&mutex);
+
         if (buffer.remove_item(&item)) {
             cout << "Consumer " << item << ": Removed item " << item << endl;
             buffer.print_buffer();
         } else {
             cout << "Consumer error condition" << endl;    // shouldn't come here
         }
+
+        pthread_mutex_unlock(&mutex);
+        sem_post(&empty);
     }
 }
 
@@ -93,19 +77,53 @@ int main(int argc, char *argv[]) {
     // How long does the main thread sleep before terminating (in seconds)
     // he number of producer threads
     // The number of consumer threads 
-    if (argc < 4) {
+    if (argc != 4) {
         cerr << "Usage: " << argv[0] << " <input_file>" << endl;
         exit(1);
     }
 
-    int sleep_time = std::stoi(argv[1]);
-    int producer_threads = stoi(argv[2]);
-    int consumer_threads = stoi(argv[3]);
+    int sleep_time = stoi(argv[1]);
+    int num_producer_threads = stoi(argv[2]);
+    int num_consumer_threads = stoi(argv[3]);
 
     /* TODO: 2. Initialize buffer and synchronization primitives */
-    /* TODO: 3. Create producer thread(s).
-     * You should pass an unique int ID to each producer thread, starting from 1 to number of threads */
+    buffer = Buffer(5);
+    
+    pthread_mutex_init(&mutex, NULL);
+    sem_init(&empty, 0, 10);
+    sem_init(&full, 0, 0);
+
+    //TODO: 3. Create producer thread(s).
+    // Create a set of threads
+    // declare an array of thread IDs
+    pthread_t producer_threads[num_producer_threads];
+
+    // loop to create threads
+    for (int i = 0; i < num_producer_threads; i++) {
+        // create the thread
+        int result = pthread_create(&producer_threads[i], NULL, producer, (void*)i);
+        if (result != 0) {
+            // handle error
+            fprintf(stderr, "Error creating thread %d: %s\n", i, strerror(result));
+            exit(1);
+        }
+    }
+    /* You should pass an unique int ID to each producer thread, starting from 1 to number of threads */
     /* TODO: 4. Create consumer thread(s) */
+    pthread_t consumer_threads[num_producer_threads];
+
+    // loop to create threads
+    for (int i = 0; i < num_consumer_threads; i++) {
+        // create the thread
+        int result = pthread_create(&consumer_threads[i], NULL, consumer, (void*)i);
+        if (result != 0) {
+            // handle error
+            fprintf(stderr, "Error creating thread %d: %s\n", i, strerror(result));
+            exit(EXIT_FAILURE);
+        }
+    }
     /* TODO: 5. Main thread sleep */
+    sleep(10); 
     /* TODO: 6. Exit */
+    exit(0);
 }
