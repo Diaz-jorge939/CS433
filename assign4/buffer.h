@@ -9,7 +9,7 @@
 #ifndef ASSIGN4_BUFFER_H
 #define ASSIGN4_BUFFER_H
 // #define BUFFER_SIZE 5
-
+#include <vector>
 // Define the data type of the buffer items
 typedef int buffer_item;
 
@@ -18,11 +18,13 @@ typedef int buffer_item;
  */
 class Buffer {
 private: 
-    buffer_item* arr_buffer;
+    // buffer_item* arr_buffer;
+    std::vector<buffer_item> arr_buffer;
+
     int buffer_size;
-    int in = 0;
-    int out = 0;
-    int count = 0;
+    // int in = 0;
+    // int out = 0;
+    // int count = 0;
     
 public:
     /**

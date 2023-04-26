@@ -11,6 +11,7 @@
 #include <unistd.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <string.h>
 
 using namespace std;
 
@@ -76,9 +77,7 @@ void *consumer(void *param) {
 
 int main(int argc, char *argv[]) {
     /* TODO: 1. Get command line arguments argv[1],argv[2],argv[3] */
-    // How long does the main thread sleep before terminating (in seconds)
-    // he number of producer threads
-    // The number of consumer threads 
+
     if (argc != 4) {
         cerr << "Usage: " << argv[0] << " <input_file>" << endl;
         exit(1);
@@ -88,11 +87,13 @@ int main(int argc, char *argv[]) {
     int num_producer_threads = stoi(argv[2]);
     int num_consumer_threads = stoi(argv[3]);
 
+    int arr [num_producer_threads];
+
     /* TODO: 2. Initialize buffer and synchronization primitives */
     buffer = Buffer(5);
     
     pthread_mutex_init(&mutex, NULL);
-    sem_init(&empty, 0, 10);
+    sem_init(&empty, 0, 5);
     sem_init(&full, 0, 0);
 
     //TODO: 3. Create producer thread(s).
@@ -100,15 +101,21 @@ int main(int argc, char *argv[]) {
     // declare an array of thread IDs
     pthread_t producer_threads[num_producer_threads];
 
+    for (int i = 0; i < num_producer_threads; i++)
+    {
+        arr[i] = i+1; 
+    }
+
     // loop to create threads
     for (int i = 0; i < num_producer_threads; i++) {
         // create the thread
-        int result = pthread_create(&producer_threads[i], NULL, producer, (void*)i);
+        int result = pthread_create(&producer_threads[i], NULL, producer, &arr[i]);
         if (result != 0) {
             // handle error
             fprintf(stderr, "Error creating thread %d: %s\n", i, strerror(result));
             exit(1);
         }
+
     }
     /* You should pass an unique int ID to each producer thread, starting from 1 to number of threads */
     /* TODO: 4. Create consumer thread(s) */
@@ -117,7 +124,7 @@ int main(int argc, char *argv[]) {
     // loop to create threads
     for (int i = 0; i < num_consumer_threads; i++) {
         // create the thread
-        int result = pthread_create(&consumer_threads[i], NULL, consumer, (void*)i);
+        int result = pthread_create(&consumer_threads[i], NULL, consumer, NULL);
         if (result != 0) {
             // handle error
             fprintf(stderr, "Error creating thread %d: %s\n", i, strerror(result));
@@ -125,7 +132,7 @@ int main(int argc, char *argv[]) {
         }
     }
     /* TODO: 5. Main thread sleep */
-    sleep(10); 
+    sleep(sleep_time); 
     /* TODO: 6. Exit */
     exit(0);
 }

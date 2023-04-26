@@ -11,54 +11,44 @@
 #include "buffer.h"
 #include <semaphore.h>
 #include <pthread.h>
+#include <stdio.h>
+#include <iostream>
+#include <vector>
+
+using namespace std;
 
 Buffer::Buffer(int size){
     /* the buffer */
     this->buffer_size = size;
-    arr_buffer = new buffer_item[size];
-
+    //arr_buffer = new buffer_item[size];
 }
 Buffer::~Buffer(){
-    delete arr_buffer[];
 }
 
 bool Buffer::insert_item(buffer_item item){
     /* insert item into buffer
    return 0 if successful, otherwise
    return -1 indicating an error condition */
-   // Insert the item into the buffer
+   
+//     // Insert the item into the buffer
+//    if(count == 0){
+//     int insert_index = (in) % buffer_size;
+//    }
+//    else{
+//     int insert_index = (in + 1) % buffer_size;
+//    }
+    
+//     arr_buffer[insert_index] = item;
+//     in = insert_index;
+//     count++;
 
-    // Wait on the empty semaphore to ensure there is space in the buffer
-    if (sem_wait(&empty) == -1) {
-        perror("sem_wait");
-        exit(1);
+    while(arr_buffer.size() == buffer_size); // do nothing. buffer is full
+    if(arr_buffer.size() < buffer_size) {
+        arr_buffer.push_back(item);
+        return true;
+    } else {
+        return false;
     }
-
-    // Acquire the mutex lock to ensure mutual exclusion
-    if (pthread_mutex_lock(&mutex) != 0) {
-        perror("pthread_mutex_lock");
-        exit(1);
-    }
-
-    // Insert the item into the buffer
-    int insert_index = (in + 1) % buffer_size;
-    buffer[insert_index] = item;
-    in = insert_index;
-    count++;
-
-    // Release the mutex lock
-    if (pthread_mutex_unlock(&mutex) != 0) {
-        perror("pthread_mutex_unlock");
-        exit(1);
-    }
-
-    // Signal the full semaphore to indicate that there is one more item in the buffer
-    if (sem_post(&full) == -1) {
-        perror("sem_post");
-        exit(1);
-    }
-
-    return true;
 
     
 }
@@ -67,19 +57,50 @@ bool Buffer::remove_item(buffer_item *item){
    placing it in item
    return 0 if successful, otherwise
    return -1 indicating an error condition */
+    // get item from buffer
+    // *item = arr_buffer[out];
+    // out = (out+ 1) % buffer_size;
+    // count--;
+    while(arr_buffer.empty()); //do nothing buffer is empty
+    if (arr_buffer.empty()) {
+        return false;
+    }
+
+    *item = arr_buffer.back();
+    arr_buffer.pop_back();
+
+    return true;
 
 }
 int Buffer::get_size(){
-    
+    return buffer_size;
     
 }
 int Buffer::get_count(){
-
+    return arr_buffer.size();
 }
 bool Buffer::is_empty(){
+    if(arr_buffer.empty()){
+        return true;
+    }
 
+    return false;
 }
 
 void Buffer::print_buffer(){
-
+    
+    if(arr_buffer.size() <= 1){
+        cout << "Buffer: ["<< arr_buffer[0] << "]" << endl;
+        return;
+    }
+    
+    
+    cout << "Buffer: [";
+    for (int i = 0; i < arr_buffer.size(); i++) {
+        if(i == arr_buffer.size()-1){
+            cout << arr_buffer[i] << "]"<< endl;
+            break;
+        }
+        cout << arr_buffer[i] << ", ";
+    }
 }
