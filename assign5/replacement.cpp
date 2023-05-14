@@ -28,36 +28,27 @@ Replacement::~Replacement()
 // @return true if it's a page fault
 bool Replacement::access_page(int page_num, bool is_write)
 {
-    // track number of references 
+    // track number of references
     num_references++;
-    
-    PageEntry entry = getPageEntry(page_num);
 
-    // If the page is valid, it calls the touch_page function.
-    if(entry.valid == true){
-        // touch_page(page_num);
-        return true;
-    }
-
-    // If the page is not valid but free frames are available, it calls the load_page function.
-    else if(frame_counter < frames_limit){
-        // page fault counter
-        pagefaults_count++;
-
-        load_page(page_num);
-        return false;
-    }
-
-    // If the page is not valid and there is no free frame, it calls the replace_page function.
-    else {
-        // track page replacements
-        pageReplacements_count++;
-        // replace page
-        replace_page(page_num);
-        return false;
-    }
-
-    return false;
+  if (!page_table[page_num].valid) 
+  {
+    // If the page is not valid but free frames are available, it calls the load_page function 
+	  if (frame_counter < frames_limit) {
+      		load_page(page_num);
+      		frame_counter++;
+	  } 
+	  // If the page is not valid and there is no free frame, it calls the replace_page function.
+	  else {
+		  pageReplacements_count++;
+		  replace_page(page_num);
+	  }
+	  pagefaults_count++;
+	  return true;
+  }
+	// If the page is valid, it calls the touch_page function.
+	touch_page(page_num);
+	return false;
 }
 
 // Print out statistics of simulation
