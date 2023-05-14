@@ -15,7 +15,8 @@ FIFOReplacement::FIFOReplacement(int num_pages, int num_frames)
 
 FIFOReplacement::~FIFOReplacement() {
 }
-
+void touch_page(int page_num){
+}
 // Access an invalid page, but free frames are available
 void FIFOReplacement::load_page(int page_num) {
     
