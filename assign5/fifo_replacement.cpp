@@ -1,34 +1,63 @@
 /**
 * Assignment 5: Page replacement algorithms
  * @file fifo_replacement.cpp
- * @author ??? (TODO: your name)
+ * @author Jorge Diaz
  * @brief A class implementing the FIFO page replacement algorithms
  * @version 0.1
  */
-//You must complete the all parts marked as "TODO". Delete "TODO" after you are done.
-// Remember to add sufficient and clear comments to your code
 
 #include "fifo_replacement.h"
+#include <vector>
 
-// TODO: Add your implementation here
 FIFOReplacement::FIFOReplacement(int num_pages, int num_frames)
-: Replacement(num_pages, num_frames)
-{
-    // TODO: Add additional implementation code
+: Replacement(num_pages, num_frames){
 }
 
-// TODO: Add your implementations for desctructor, load_page, replace_page here
 FIFOReplacement::~FIFOReplacement() {
-    // TODO: Add necessary code here
+    for (auto& entry_ptr : queue) {
+            delete entry_ptr;
+    }
 }
 
 // Access an invalid page, but free frames are available
 void FIFOReplacement::load_page(int page_num) {
-    // TODO: Update your data structure FIFO replacement and pagetable
+    
+
+    //getpage entry - update valid bit and frame number
+    PageEntry* entry_ptr = getPageEntryaddress(page_num);
+
+    entry_ptr->valid = true;
+    entry_ptr->frame_num = frame_counter;
+
+    // push the page into the queue
+    queue.push_back(entry_ptr);
+
+    
+
+    //increment frame number
+    frame_counter++;
 }
 
 // Access an invalid page and no free frames are available
 int FIFOReplacement::replace_page(int page_num) {
-    // TODO: Update your data structure FIFO replacement and pagetable
+    // Update your data structure FIFO replacement and pagetable
+
+    // before removing, update valid bit to 0 
+    PageEntry* replaced_page = queue.back();
+    replaced_page->valid = false;
+    replaced_page->frame_num = 0;
+
+
+    //removing first page entry from FIFO replacement data structure
+    queue.pop_back();
+
+    //update pagetable
+    PageEntry* entry = getPageEntryaddress(page_num);
+
+    entry->frame_num = frame_counter;
+    entry->valid = true;
+
+    frame_counter--;
+
     return 0;
 }

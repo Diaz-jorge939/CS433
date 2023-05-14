@@ -8,13 +8,15 @@
 #pragma once
 
 #include "replacement.h"
+#include <vector>
 
 /**
  * @brief A class to simulate FIFO page replacement algorithm.
  */
 class FIFOReplacement : public Replacement {
 private:
-    // TODO: Add necessary member variables to this class
+    // data structure used to track order of page entering
+    std::vector<PageEntry*> queue; 
 
 public:
     /**
@@ -28,6 +30,8 @@ public:
     * @brief Destructor
     */
     virtual ~FIFOReplacement();
+
+    virtual void touch_page(int page_num);
 
     /**
      * @brief Access an invalid page, but free frames are available.
