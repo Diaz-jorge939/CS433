@@ -29,11 +29,6 @@ void FIFOReplacement::load_page(int page_num) {
 
     // push the page into the queue
     queue.push(entry_ptr);
-
-    
-
-    //increment frame number
-    frame_counter++;
 }
 
 // Access an invalid page and no free frames are available
@@ -51,11 +46,10 @@ int FIFOReplacement::replace_page(int page_num) {
 
     //update pagetable
     PageEntry* entry = getPageEntryaddress(page_num);
-
+    
     entry->frame_num = frame_counter;
     entry->valid = true;
-
-    frame_counter--;
-
+    queue.push(entry);
+    
     return 0;
 }
