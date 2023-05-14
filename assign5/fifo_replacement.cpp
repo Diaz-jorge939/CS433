@@ -7,16 +7,13 @@
  */
 
 #include "fifo_replacement.h"
-#include <vector>
+#include <queue>
 
 FIFOReplacement::FIFOReplacement(int num_pages, int num_frames)
 : Replacement(num_pages, num_frames){
 }
 
 FIFOReplacement::~FIFOReplacement() {
-    for (auto& entry_ptr : queue) {
-            delete entry_ptr;
-    }
 }
 
 // Access an invalid page, but free frames are available
@@ -30,7 +27,7 @@ void FIFOReplacement::load_page(int page_num) {
     entry_ptr->frame_num = frame_counter;
 
     // push the page into the queue
-    queue.push_back(entry_ptr);
+    queue.push(entry_ptr);
 
     
 
@@ -43,13 +40,13 @@ int FIFOReplacement::replace_page(int page_num) {
     // Update your data structure FIFO replacement and pagetable
 
     // before removing, update valid bit to 0 
-    PageEntry* replaced_page = queue.back();
+    PageEntry* replaced_page = queue.front();
     replaced_page->valid = false;
     replaced_page->frame_num = 0;
 
 
     //removing first page entry from FIFO replacement data structure
-    queue.pop_back();
+    queue.pop();
 
     //update pagetable
     PageEntry* entry = getPageEntryaddress(page_num);
