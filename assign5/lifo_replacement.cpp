@@ -28,9 +28,6 @@ void LIFOReplacement::load_page(int page_num) {
 
     // push the page into the queue
     stack.push_back(entry_ptr);
-
-    //increment frame number
-    frame_counter++;
 }
 
 // Access an invalid page and no free frames are available
@@ -50,8 +47,7 @@ int LIFOReplacement::replace_page(int page_num) {
 
     entry->frame_num = frame_counter;
     entry->valid = true;
-
-    frame_counter--;
-
+    stack.push_back(entry);
+    
     return 0;
 }
