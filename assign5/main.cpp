@@ -94,16 +94,52 @@ int main(int argc, char *argv[]) {
     // Test 2: Read and simulate the large list of logical addresses from the input file "large_refs.txt"
     std::cout << "\n================================Test 2==================================================\n";
 
-    std::cout << "****************Simulate FIFO replacement****************************" << std::endl;
-    // TODO: Add your code to calculate number of page faults using FIFO replacement algorithm
-    // TODO: print the statistics and run-time
+        std::cout << "****************Simulate FIFO replacement****************************" << std::endl;
+    
+    std::ifstream in1;
+    // Open the samll reference file
+    in1.open("large_refs.txt");
+    if (!in1.is_open()) {
+        std::cerr << "Cannot open small_refs.txt to read. Please check your path." << std::endl;
+        return 1;
+    }
+    int val1;
+    // Create a vector to store the logical addresses
+    std::vector<int> large_refs;
+    while (in1 >> val1) {
+        large_refs.push_back(val1);
+    }
+    // Create a virtual memory simulation using FIFO replacement algorithm
+    FIFOReplacement vm1(num_pages, num_frames);
+    for (std::vector<int>::const_iterator it = large_refs.begin(); it != large_refs.end(); ++it) {
+        int page_num = (*it) >> page_offset_bits;
+        vm1.access_page(page_num, 0);
+
+    }
+    in1.close();
+    vm1.print_statistics();
 
     std::cout << "****************Simulate LIFO replacement****************************" << std::endl;
-    // TODO: Add your code to calculate number of page faults using LIFO replacement algorithm
-    // TODO: print the statistics and run-time
-
-    std::cout << "****************Simulate LRU replacement****************************" << std::endl;
-    // TODO: Add your code to calculate number of page faults using LRU replacement algorithm
-    // TODO: print the statistics and run-time
-
-}
+    
+    std::ifstream in2;
+    // Open the samll reference file
+    in2.open("large_refs.txt");
+    if (!in2.is_open()) {
+        std::cerr << "Cannot open small_refs.txt to read. Please check your path." << std::endl;
+        return 1;
+    }
+    int val2;
+    // Create a vector to store the logical addresses
+    std::vector<int> large_refs2;
+    while (in2 >> val2) {
+        large_refs2.push_back(val2);
+    }
+    // Create a virtual memory simulation using FIFO replacement algorithm
+    LIFOReplacement vm2(num_pages, num_frames);
+    for (std::vector<int>::const_iterator it = large_refs2.begin(); it != large_refs2.end(); ++it) {
+        int page_num = (*it) >> page_offset_bits;
+        bool isPageFault = vm2.access_page(page_num, 0);
+        PageEntry pg = vm2.getPageEntry(page_num);
+    }
+    in2.close();
+    vm2.print_statistics();
