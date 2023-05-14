@@ -8,7 +8,7 @@
 #pragma once
 
 #include "replacement.h"
-#include <vector>
+#include <queue>
 
 /**
  * @brief A class to simulate FIFO page replacement algorithm.
@@ -16,7 +16,7 @@
 class FIFOReplacement : public Replacement {
 private:
     // data structure used to track order of page entering
-    std::vector<PageEntry*> queue; 
+    std::queue<PageEntry*> queue; 
 
 public:
     /**
