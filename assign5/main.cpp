@@ -143,3 +143,4 @@ int main(int argc, char *argv[]) {
     }
     in2.close();
     vm2.print_statistics();
+}
